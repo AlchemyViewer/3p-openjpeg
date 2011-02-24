@@ -42,14 +42,14 @@ pushd "$PNG_SOURCE_DIR"
             cp {png.h,pngconf.h,pnglibconf.h} "$stage/include/libpng15"
         ;;
         "darwin")
-            ./configure --prefix="$stage" --with-zlib-prefix="$stage/packages"
+            ./configure --prefix="$stage" --with-zlib-prefix="$stage/packages" --enable-png=no
             make
             make install
-	    mkdir -p "$stage/lib/release"
-	    cp "$stage/lib/libpng15.a" "$stage/lib/release/"
+#	    mkdir -p "$stage/lib/release"
+#	    cp "$stage/lib/libpng15.a" "$stage/lib/release/"
         ;;
         "linux")
-	    CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage"
+	    CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage" --enable-png=no
             make
             make install
 #	    mkdir -p "$stage/lib/release"
