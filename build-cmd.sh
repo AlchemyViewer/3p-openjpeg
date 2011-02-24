@@ -29,17 +29,16 @@ pushd "$PNG_SOURCE_DIR"
         "windows")
             load_vsvars
             
-            build_sln "projects/vstudio/vstudio.sln" "Release Library|Win32" "pnglibconf"
-            build_sln "projects/vstudio/vstudio.sln" "Debug Library|Win32" "libpng"
-            build_sln "projects/vstudio/vstudio.sln" "Release Library|Win32" "libpng"
+            build_sln "DllOpenJPEG.sln" "Release|Win32" "DllOpenJPEG"
+            build_sln "DllOpenJPEG.sln" "Debug|Win32" "DllOpenJPEG"
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
-            cp projects/vstudio/Release\ Library/libpng15.lib "$stage/lib/release/libpng15.lib"
-            cp projects/vstudio/libpng/Release\ Library/vc100*\.?db "$stage/lib/release/"
-            cp projects/vstudio/Debug\ Library/libpng15.lib "$stage/lib/debug/libpng15.lib"
-            cp projects/vstudio/libpng/Debug\ Library/vc100*\.?db "$stage/lib/debug/"
-            mkdir -p "$stage/include/libpng15"
-            cp {png.h,pngconf.h,pnglibconf.h} "$stage/include/libpng15"
+#            cp projects/vstudio/Release\ Library/libpng15.lib "$stage/lib/release/libpng15.lib"
+#            cp projects/vstudio/libpng/Release\ Library/vc100*\.?db "$stage/lib/release/"
+#            cp projects/vstudio/Debug\ Library/libpng15.lib "$stage/lib/debug/libpng15.lib"
+#            cp projects/vstudio/libpng/Debug\ Library/vc100*\.?db "$stage/lib/debug/"
+#            mkdir -p "$stage/include/libpng15"
+#            cp {png.h,pngconf.h,pnglibconf.h} "$stage/include/libpng15"
         ;;
         "darwin")
             ./configure --prefix="$stage" --with-zlib-prefix="$stage/packages" --enable-png=no
