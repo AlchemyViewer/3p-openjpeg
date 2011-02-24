@@ -245,7 +245,7 @@ with_doxygen = @with_doxygen@
 
 #OpenJPEG top source directory
 SUBDIRS = libopenjpeg codec mj2 @jpwl_dir@ @jp3d_dir@ doc
-pkgconf_dir = /usr/lib/pkgconfig
+pkgconf_dir = $(libdir)/pkgconfig
 all: opj_config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
