@@ -39,8 +39,8 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>include/zlib/*.h</string>
             <string>LICENSES/openjpeg.txt</string>
+            <string>include/open/*.h</string>
           </array>
           <key>name</key>
           <string>common</string>
@@ -106,8 +106,8 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/debug/zlibd.lib</string>
-            <string>lib/release/zlib.lib</string>
+            <string>/lib/debug/*</string>
+            <string>/lib/release/*</string>
           </array>
           <key>name</key>
           <string>windows</string>

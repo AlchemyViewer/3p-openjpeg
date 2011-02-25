@@ -28,17 +28,17 @@ pushd "$PNG_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
         "windows")
             load_vsvars
+
+	    cmake . -G"Visual Studio 10" -DCMAKE_INSTALL_PREFIX=$stage
             
-            build_sln "DllOpenJPEG.sln" "Release|Win32" "DllOpenJPEG"
-            build_sln "DllOpenJPEG.sln" "Debug|Win32" "DllOpenJPEG"
+            build_sln "OPENJPEG.sln" "Release|Win32"
+            build_sln "OPENJPEG.sln" "Debug|Win32"
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
-#            cp projects/vstudio/Release\ Library/libpng15.lib "$stage/lib/release/libpng15.lib"
-#            cp projects/vstudio/libpng/Release\ Library/vc100*\.?db "$stage/lib/release/"
-#            cp projects/vstudio/Debug\ Library/libpng15.lib "$stage/lib/debug/libpng15.lib"
-#            cp projects/vstudio/libpng/Debug\ Library/vc100*\.?db "$stage/lib/debug/"
-#            mkdir -p "$stage/include/libpng15"
-#            cp {png.h,pngconf.h,pnglibconf.h} "$stage/include/libpng15"
+            cp bin/Release/openjpeg* "$stage/lib/release"
+            cp bin/Debug/openjpeg* "$stage/lib/debug"
+            mkdir -p "$stage/include/openjpeg"
+            cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
         ;;
         "darwin")
             ./configure --prefix="$stage" --with-zlib-prefix="$stage/packages" --enable-png=no
