@@ -41,14 +41,14 @@ pushd "$PNG_SOURCE_DIR"
             cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
         ;;
         "darwin")
-            ./configure --prefix="$stage" --with-zlib-prefix="$stage/packages" --enable-png=no
+            ./configure --prefix="$stage" --with-zlib-prefix="$stage/packages" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
             make
             make install
 #	    mkdir -p "$stage/lib/release"
 #	    cp "$stage/lib/libpng15.a" "$stage/lib/release/"
         ;;
         "linux")
-	    CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage" --enable-png=no
+	    CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
             make
             make install
 #	    mkdir -p "$stage/lib/release"

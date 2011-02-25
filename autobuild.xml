@@ -84,7 +84,7 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/libz.a</string>
+            <string>lib/release/openjpeg*</string>
           </array>
           <key>name</key>
           <string>linux</string>
