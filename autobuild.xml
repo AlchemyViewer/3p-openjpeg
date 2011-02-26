@@ -62,7 +62,7 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/openjpeg/libopenjpeg.a</string>
+            <string>lib/release/libopenjpeg.a</string>
           </array>
           <key>name</key>
           <string>darwin</string>
