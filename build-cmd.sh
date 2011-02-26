@@ -7,8 +7,8 @@ set -x
 # make errors fatal
 set -e
 
-PNG_VERSION="1.4"
-PNG_SOURCE_DIR="openjpeg_v1_4_sources_r697"
+OPENJPEG_VERSION="1.4"
+OPENJPEG_SOURCE_DIR="openjpeg_v1_4_sources_r697"
 
 if [ -z "$AUTOBUILD" ] ; then 
     fail
@@ -24,7 +24,7 @@ eval "$("$AUTOBUILD" source_environment)"
 set -x
 
 stage="$(pwd)/stage"
-pushd "$PNG_SOURCE_DIR"
+pushd "$OPENJPEG_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
         "windows")
             load_vsvars
@@ -41,18 +41,16 @@ pushd "$PNG_SOURCE_DIR"
             cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
         ;;
         "darwin")
-            ./configure --prefix="$stage" --with-zlib-prefix="$stage/packages" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
-            make
-            make install
-#	    mkdir -p "$stage/lib/release"
-#	    cp "$stage/lib/libpng15.a" "$stage/lib/release/"
+	    cmake . -GXcode -D'CMAKE_OSX_ARCHITECTURES:STRING=i386;ppc' -D'BUILD_SHARED_LIBS:bool=off' -D'BUILD_CODEC:bool=off' -DCMAKE_INSTALL_PREFIX=$stage
+	    xcodebuild -configuration Release -target libopenjpeg.a -project openjpeg.xcodeproj
+	    xcodebuild -configuration Release -target install -project openjpeg.xcodeproj
+            mkdir -p "$stage/include/openjpeg"
+	    cp "$stage/include/openjpeg-$OPENJPEG_VERSION/openjpeg.h" "$stage/include/openjpeg"
         ;;
         "linux")
 	    CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
             make
             make install
-#	    mkdir -p "$stage/lib/release"
-#	    cp "$stage/lib/libpng15.a" "$stage/lib/release/"
         ;;
     esac
     mkdir -p "$stage/LICENSES"
