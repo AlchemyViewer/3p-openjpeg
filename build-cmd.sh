@@ -7,8 +7,8 @@ set -x
 # make errors fatal
 set -e
 
-OPENJPEG_VERSION="1.4"
-OPENJPEG_SOURCE_DIR="openjpeg_v1_4_sources_r697"
+OPENJPEG_VERSION="1.5.1"
+OPENJPEG_SOURCE_DIR="openjpeg-1.5.1"
 
 if [ -z "$AUTOBUILD" ] ; then 
     fail

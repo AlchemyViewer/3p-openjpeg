@@ -115,9 +115,9 @@
         </map>
       </map>
       <key>source_directory</key>
-      <string>openjpeg_v1_4_sources_r697</string>
+      <string>openjpeg-1.5.1</string>
       <key>version</key>
-      <string>1.4</string>
+      <string>1.5.1</string>
     </map>
     <key>type</key>
     <string>autobuild</string>
