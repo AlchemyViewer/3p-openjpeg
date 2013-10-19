@@ -42,6 +42,22 @@ pushd "$OPENJPEG_SOURCE_DIR"
             mkdir -p "$stage/include/openjpeg"
             cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
         ;;
+        "windows64")
+            load_vsvars
+
+            cmake . -G"Visual Studio 11 Win64" -DCMAKE_INSTALL_PREFIX=$stage
+            
+            build_sln "OPENJPEG.sln" "Release|x64"
+            build_sln "OPENJPEG.sln" "Debug|x64"
+            mkdir -p "$stage/lib/debug"
+            mkdir -p "$stage/lib/release"
+            cp bin/Release/openjpeg{.dll,.lib} "$stage/lib/release"
+            cp bin/Debug/openjpeg.dll "$stage/lib/debug/openjpegd.dll"
+            cp bin/Debug/openjpeg.lib "$stage/lib/debug/openjpegd.lib"
+            cp bin/Debug/openjpeg.pdb "$stage/lib/debug/openjpegd.pdb"
+            mkdir -p "$stage/include/openjpeg"
+            cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
+        ;;
         "darwin")
 	    cmake . -GXcode -D'CMAKE_OSX_ARCHITECTURES:STRING=i386;ppc' -D'BUILD_SHARED_LIBS:bool=off' -D'BUILD_CODEC:bool=off' -DCMAKE_INSTALL_PREFIX=$stage
 	    xcodebuild -configuration Release -target libopenjpeg.a -project openjpeg.xcodeproj

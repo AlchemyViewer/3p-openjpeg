@@ -113,6 +113,29 @@
           <key>name</key>
           <string>windows</string>
         </map>
+        <key>windows64</key>
+        <map>
+          <key>configurations</key>
+          <map>
+            <key>Release</key>
+            <map>
+              <key>build</key>
+              <map>
+              </map>
+              <key>default</key>
+              <boolean>true</boolean>
+              <key>name</key>
+              <string>Release</string>
+            </map>
+          </map>
+          <key>manifest</key>
+          <array>
+            <string>lib/debug/*</string>
+            <string>lib/release/*</string>
+          </array>
+          <key>name</key>
+          <string>windows64</string>
+        </map>
       </map>
       <key>source_directory</key>
       <string>openjpeg-1.5.1</string>
