@@ -59,8 +59,8 @@ pushd "$OPENJPEG_SOURCE_DIR"
             cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
         ;;
         "darwin")
-	    cmake . -GXcode -D'CMAKE_OSX_ARCHITECTURES:STRING=i386;ppc' -D'BUILD_SHARED_LIBS:bool=off' -D'BUILD_CODEC:bool=off' -DCMAKE_INSTALL_PREFIX=$stage
-	    xcodebuild -configuration Release -target libopenjpeg.a -project openjpeg.xcodeproj
+	    cmake . -GXcode -D'CMAKE_OSX_ARCHITECTURES:STRING=i386;x86_64' -D'BUILD_SHARED_LIBS:bool=off' -D'BUILD_CODEC:bool=off' -DCMAKE_INSTALL_PREFIX=$stage
+	    xcodebuild -configuration Release -target openjpeg -project openjpeg.xcodeproj
 	    xcodebuild -configuration Release -target install -project openjpeg.xcodeproj
             mkdir -p "$stage/lib/release"
 	    cp "$stage/lib/libopenjpeg.a" "$stage/lib/release/libopenjpeg.a"
