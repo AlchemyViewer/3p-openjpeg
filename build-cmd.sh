@@ -7,7 +7,7 @@ set -x
 # make errors fatal
 set -e
 
-OPENJPEG_VERSION="1.5.1"
+OPENJPEG_VERSION="1.5"
 OPENJPEG_SOURCE_DIR="openjpeg-1.5.1"
 
 if [ -z "$AUTOBUILD" ] ; then 
@@ -69,7 +69,18 @@ pushd "$OPENJPEG_SOURCE_DIR"
 	  
         ;;
         "linux")
-            CFLAGS="-m32" CPPFLAGS="-m32" LDFLAGS="-m32" ./configure --target=i686-linux-gnu --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
+            CFLAGS="-m32 -O3 -ffast-math" CPPFLAGS="-m32" LDFLAGS="-m32" ./configure --target=i686-linux-gnu --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
+            make
+            make install
+
+            mv "$stage/include/openjpeg-$OPENJPEG_VERSION" "$stage/include/openjpeg"
+
+            mv "$stage/lib" "$stage/release"
+            mkdir -p "$stage/lib"
+            mv "$stage/release" "$stage/lib"
+        ;;
+        "linux64")
+            CFLAGS="-m64 -O3 -ffast-math" CPPFLAGS="-m64" LDFLAGS="-m64" ./configure --target=i686-linux-gnu --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
             make
             make install
 

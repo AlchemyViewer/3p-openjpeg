@@ -90,6 +90,29 @@
           <key>name</key>
           <string>linux</string>
         </map>
+        <key>linux64</key>
+        <map>
+          <key>configurations</key>
+          <map>
+            <key>Release</key>
+            <map>
+              <key>build</key>
+              <map>
+              </map>
+              <key>default</key>
+              <boolean>true</boolean>
+              <key>name</key>
+              <string>Release</string>
+            </map>
+          </map>
+          <key>manifest</key>
+          <array>
+            <string>lib/release/libopenjpeg*.so*</string>
+            <string>lib/release/libopenjpeg.a</string>
+          </array>
+          <key>name</key>
+          <string>linux64</string>
+        </map>
         <key>windows</key>
         <map>
           <key>configurations</key>
