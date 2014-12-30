@@ -7,7 +7,7 @@ set -x
 # make errors fatal
 set -e
 
-OPENJPEG_VERSION="1.5"
+OPENJPEG_VERSION="1.5.1"
 OPENJPEG_SOURCE_DIR="openjpeg-1.5.1"
 
 if [ -z "$AUTOBUILD" ] ; then 
@@ -24,6 +24,9 @@ eval "$("$AUTOBUILD" source_environment)"
 set -x
 
 stage="$(pwd)/stage"
+
+echo "${OPENJPEG_VERSION}" > "${stage}/VERSION.txt"
+
 pushd "$OPENJPEG_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
         "windows")
