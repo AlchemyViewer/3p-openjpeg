@@ -76,18 +76,18 @@ pushd "$OPENJPEG_SOURCE_DIR"
             make
             make install
 
-            mv "$stage/include/openjpeg-$OPENJPEG_VERSION" "$stage/include/openjpeg"
+            mv "$stage/include/openjpeg-1.5" "$stage/include/openjpeg"
 
             mv "$stage/lib" "$stage/release"
             mkdir -p "$stage/lib"
             mv "$stage/release" "$stage/lib"
         ;;
         "linux64")
-            CFLAGS="-m64 -O3 -ffast-math" CPPFLAGS="-m64" LDFLAGS="-m64" ./configure --target=i686-linux-gnu --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
+            CFLAGS="-m64 -O3 -ffast-math" CPPFLAGS="-m64" LDFLAGS="-m64" ./configure --target=x86_64-linux-gnu --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
             make
             make install
 
-            mv "$stage/include/openjpeg-$OPENJPEG_VERSION" "$stage/include/openjpeg"
+            mv "$stage/include/openjpeg-1.5" "$stage/include/openjpeg"
 
             mv "$stage/lib" "$stage/release"
             mkdir -p "$stage/lib"
