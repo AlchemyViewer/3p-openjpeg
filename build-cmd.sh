@@ -72,8 +72,11 @@ pushd "$OPENJPEG_SOURCE_DIR"
 	  
         ;;
         "linux")
-            CFLAGS="-m32 -O3 -ffast-math" CPPFLAGS="-m32" LDFLAGS="-m32" ./configure --target=i686-linux-gnu --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
-            make
+            JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
+            HARDENED="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
+            CFLAGS="-m32 -O3 -ffast-math $HARDENED" CPPFLAGS="-m32" LDFLAGS="-m32" ./configure --target=i686-linux-gnu --prefix="$stage" \
+                --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
+            make -j$JOBS
             make install
 
             mv "$stage/include/openjpeg-1.5" "$stage/include/openjpeg"
@@ -83,8 +86,11 @@ pushd "$OPENJPEG_SOURCE_DIR"
             mv "$stage/release" "$stage/lib"
         ;;
         "linux64")
-            CFLAGS="-m64 -O3 -ffast-math" CPPFLAGS="-m64" LDFLAGS="-m64" ./configure --target=x86_64-linux-gnu --prefix="$stage" --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
-            make
+            JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
+            HARDENED="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
+            CFLAGS="-m64 -O3 -ffast-math $HARDENED" CPPFLAGS="-m64" LDFLAGS="-m64" ./configure --target=x86_64-linux-gnu --prefix="$stage" \
+                --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
+            make -j$JOBS
             make install
 
             mv "$stage/include/openjpeg-1.5" "$stage/include/openjpeg"
