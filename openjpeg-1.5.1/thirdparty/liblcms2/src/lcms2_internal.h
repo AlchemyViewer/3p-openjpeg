@@ -80,7 +80,7 @@
 
 // Other replacement functions
 #ifdef _MSC_VER
-# ifndef snprintf
+# #if (_MSC_VER < 1900)
 #       define snprintf  _snprintf
 # endif
 # ifndef vsnprintf
