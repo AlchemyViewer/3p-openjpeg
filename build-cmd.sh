@@ -34,8 +34,8 @@ pushd "$OPENJPEG_SOURCE_DIR"
 
             cmake . -G"Visual Studio 14" -DCMAKE_INSTALL_PREFIX=$stage
             
-            build_sln "OPENJPEG.sln" "Release|Win32"
-            build_sln "OPENJPEG.sln" "Debug|Win32"
+            build_sln "OPENJPEG.sln" "Release" "Win32"
+            build_sln "OPENJPEG.sln" "Debug" "Win32"
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
             cp bin/Release/openjpeg{.dll,.lib} "$stage/lib/release"
@@ -50,8 +50,8 @@ pushd "$OPENJPEG_SOURCE_DIR"
 
             cmake . -G"Visual Studio 14 Win64" -DCMAKE_INSTALL_PREFIX=$stage
             
-            build_sln "OPENJPEG.sln" "Release|x64"
-            build_sln "OPENJPEG.sln" "Debug|x64"
+            build_sln "OPENJPEG.sln" "Release" "x64"
+            build_sln "OPENJPEG.sln" "Debug" "x64"
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
             cp bin/Release/openjpeg{.dll,.lib} "$stage/lib/release"
