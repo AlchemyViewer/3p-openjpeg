@@ -188,7 +188,7 @@ ENDIF(UNIX)
 
 #-----------------------------------------------------------------------------
 # Compiler specific flags:
-IF(${CMAKE_C_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_C_COMPILER_ID} MATCHES "AppleClang"))
+IF(${CMAKE_C_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_C_COMPILER_ID} MATCHES "AppleClang")
   SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast -ffast-math")
   IF(LTO AND BUILD_SHARED_LIBS)
     SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -flto")
