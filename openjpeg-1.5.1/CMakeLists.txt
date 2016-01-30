@@ -188,7 +188,13 @@ ENDIF(UNIX)
 
 #-----------------------------------------------------------------------------
 # Compiler specific flags:
-IF(CMAKE_COMPILER_IS_GNUCC)
+IF(${CMAKE_C_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_C_COMPILER_ID} MATCHES "AppleClang"))
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast -ffast-math")
+  IF(LTO AND BUILD_SHARED_LIBS)
+    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -flto")
+    SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -flto")
+  ENDIF(LTO AND BUILD_SHARED_LIBS)
+ELSEIF(${CMAKE_C_COMPILER_ID} MATCHES "GNU")
   # For all builds, make sure openjpeg is std99 compliant:
   # SET(CMAKE_C_FLAGS "-Wall -std=c99 ${CMAKE_C_FLAGS}") # FIXME: this setting prevented us from setting a coverage build.
   # Do not use ffast-math for all build, it would produce incorrect results, only set for release:
