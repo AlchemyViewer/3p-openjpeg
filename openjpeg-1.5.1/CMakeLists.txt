@@ -199,9 +199,6 @@ ELSEIF(${CMAKE_C_COMPILER_ID} MATCHES "GNU")
   # SET(CMAKE_C_FLAGS "-Wall -std=c99 ${CMAKE_C_FLAGS}") # FIXME: this setting prevented us from setting a coverage build.
   # Do not use ffast-math for all build, it would produce incorrect results, only set for release:
   SET(CMAKE_C_FLAGS_RELEASE "-ffast-math ${CMAKE_C_FLAGS_RELEASE}")
-ELSEIF (${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
-  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /O2 /Ob2 /Oi /Ot /GF /GL /Gy /Gw /arch:SSE2 /fp:fast")
-  SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /LTCG")
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 #-----------------------------------------------------------------------------
