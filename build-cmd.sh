@@ -78,7 +78,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
         ;;
         "linux")
             JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
-            HARDENED="-fstack-protector -D_FORTIFY_SOURCE=2"
+            HARDENED="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
             CFLAGS="-m32 -O3 -ffast-math $HARDENED" CPPFLAGS="-m32" LDFLAGS="-m32" ./configure --prefix="$stage" \
                 --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
             make -j$JOBS
@@ -92,7 +92,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
         ;;
         "linux64")
             JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
-            HARDENED="-fstack-protector -D_FORTIFY_SOURCE=2"
+            HARDENED="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
             CFLAGS="-m64 -O3 -ffast-math $HARDENED" CPPFLAGS="-m64" LDFLAGS="-m64" ./configure --prefix="$stage" \
                 --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
             make -j$JOBS
