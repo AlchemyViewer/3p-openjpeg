@@ -96,10 +96,17 @@ Allocate memory aligned to a 16 byte boundry
 #define opj_aligned_free(m) free(m)
 
 #ifdef HAVE_MM_MALLOC
+#ifdef _MSC_VER 
 	#undef opj_aligned_malloc
+	#define opj_aligned_malloc(size) _aligned_malloc(size, 16)
+	#undef opj_aligned_free
+	#define opj_aligned_free(m) _aligned_free(m)
+#else
+#undef opj_aligned_malloc
 	#define opj_aligned_malloc(size) _mm_malloc(size, 16)
 	#undef opj_aligned_free
 	#define opj_aligned_free(m) _mm_free(m)
+#endif
 #endif
 
 #ifdef HAVE_MEMALIGN
