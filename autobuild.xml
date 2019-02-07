@@ -3,6 +3,8 @@
 <map>
     <key>package_description</key>
     <map>
+      <key>canonical_repo</key>
+      <string>https://bitbucket.org/alchemyviewer/3p-openjpeg</string>
       <key>copyright</key>
       <string>Copyright (c) 2002-2012, Communications and Remote Sensing Laboratory, Universite catholique de Louvain (UCL), Belgium, Copyright (c) 2002-2012, Professor Benoit Macq, Copyright (c) 2003-2012, Antonin Descampe, Copyright (c) 2003-2009, Francois-Olivier Devaux, Copyright (c) 2005, Herve Drolon, FreeImage Team, Copyright (c) 2002-2003, Yannick Verschueren, Copyright (c) 2001-2003, David Janssens</string>
       <key>description</key>
@@ -90,29 +92,6 @@
           <key>name</key>
           <string>linux</string>
         </map>
-        <key>linux64</key>
-        <map>
-          <key>configurations</key>
-          <map>
-            <key>Release</key>
-            <map>
-              <key>build</key>
-              <map>
-              </map>
-              <key>default</key>
-              <boolean>true</boolean>
-              <key>name</key>
-              <string>Release</string>
-            </map>
-          </map>
-          <key>manifest</key>
-          <array>
-            <string>lib/release/libopenjpeg*.so*</string>
-            <string>lib/release/libopenjpeg.a</string>
-          </array>
-          <key>name</key>
-          <string>linux64</string>
-        </map>
         <key>windows</key>
         <map>
           <key>configurations</key>
@@ -136,30 +115,9 @@
           <key>name</key>
           <string>windows</string>
         </map>
-        <key>windows64</key>
-        <map>
-          <key>configurations</key>
-          <map>
-            <key>Release</key>
-            <map>
-              <key>build</key>
-              <map>
-              </map>
-              <key>default</key>
-              <boolean>true</boolean>
-              <key>name</key>
-              <string>Release</string>
-            </map>
-          </map>
-          <key>manifest</key>
-          <array>
-            <string>lib/debug/*</string>
-            <string>lib/release/*</string>
-          </array>
-          <key>name</key>
-          <string>windows64</string>
-        </map>
       </map>
+      <key>source_directory</key>
+      <string>openjpeg</string>
       <key>version_file</key>
       <string>VERSION.txt</string>
     </map>

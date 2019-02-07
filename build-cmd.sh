@@ -1,41 +1,67 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cd "$(dirname "$0")"
 
 # turn on verbose debugging output for parabuild logs.
-set -x
+exec 4>&1; export BASH_XTRACEFD=4; set -x
 # make errors fatal
 set -e
-
-OPENJPEG_VERSION="1.5.1"
-OPENJPEG_SOURCE_DIR="openjpeg-1.5.1"
+# complain about unset env variables
+set -u
 
 if [ -z "$AUTOBUILD" ] ; then 
-    fail
+    exit 1
 fi
 
 if [ "$OSTYPE" = "cygwin" ] ; then
-    export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
+    autobuild="$(cygpath -u $AUTOBUILD)"
+else
+    autobuild="$AUTOBUILD"
 fi
 
-# load autobuild provided shell functions and variables
-set +x
-eval "$("$AUTOBUILD" source_environment)"
-set -x
-
+top="$(pwd)"
 stage="$(pwd)/stage"
 
-echo "${OPENJPEG_VERSION}" > "${stage}/VERSION.txt"
+mkdir -p $stage
+
+# Load autobuild provided shell functions and variables
+source_environment_tempfile="$stage/source_environment.sh"
+"$autobuild" source_environment > "$source_environment_tempfile"
+. "$source_environment_tempfile"
+
+OPENJPEG_VERSION="1.5.1"
+OPENJPEG_SOURCE_DIR="openjpeg"
+
+VERSION_HEADER_FILE="$OPENJPEG_SOURCE_DIR/libopenjpeg/openjpeg.h"
+
+build=${AUTOBUILD_BUILD_ID:=0}
+
+# version will be (e.g.) "1.4.0"
+version=`sed -n -E 's/#define OPENJPEG_VERSION "([0-9])[.]([0-9])[.]([0-9]).*/\1.\2.\3/p' "${VERSION_HEADER_FILE}"`
+# shortver will be (e.g.) "230": eliminate all '.' chars
+#since the libs do not use micro in their filenames, chop off shortver at minor
+short="$(echo $version | cut -d"." -f1-2)"
+shortver="${short//.}"
+
+echo "${version}.${build}" > "${stage}/VERSION.txt"
+
+# Create the staging folders
+mkdir -p "$stage/lib"/{debug,release,relwithdebinfo}
+mkdir -p "$stage/include/openjpeg"
+mkdir -p "$stage/LICENSES"
 
 pushd "$OPENJPEG_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
-        "windows")
+
+        # ------------------------ windows, windows64 ------------------------
+        windows*)
             load_vsvars
 
-            cmake . -G"Visual Studio 15" -DCMAKE_INSTALL_PREFIX=$stage -DCMAKE_SYSTEM_VERSION="10.0.16299.0"
+            cmake . -G "$AUTOBUILD_WIN_CMAKE_GEN" -DCMAKE_INSTALL_PREFIX=$stage
             
-            build_sln "OPENJPEG.sln" "Release" "Win32"
-            build_sln "OPENJPEG.sln" "Debug" "Win32"
+            cmake --build . --config Debug --clean-first
+            cmake --build . --config Release --clean-first
+
             mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
             cp bin/Release/openjpeg{.dll,.lib} "$stage/lib/release"
@@ -45,22 +71,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
             mkdir -p "$stage/include/openjpeg"
             cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
         ;;
-        "windows64")
-            load_vsvars
 
-            cmake . -G"Visual Studio 15 Win64" -DCMAKE_INSTALL_PREFIX=$stage -DCMAKE_SYSTEM_VERSION="10.0.16299.0"
-            
-            build_sln "OPENJPEG.sln" "Release" "x64"
-            build_sln "OPENJPEG.sln" "Debug" "x64"
-            mkdir -p "$stage/lib/debug"
-            mkdir -p "$stage/lib/release"
-            cp bin/Release/openjpeg{.dll,.lib} "$stage/lib/release"
-            cp bin/Debug/openjpeg.dll "$stage/lib/debug/openjpegd.dll"
-            cp bin/Debug/openjpeg.lib "$stage/lib/debug/openjpegd.lib"
-            cp bin/Debug/openjpeg.pdb "$stage/lib/debug/openjpegd.pdb"
-            mkdir -p "$stage/include/openjpeg"
-            cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
-        ;;
         "darwin")
 	    cmake . -GXcode -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
             -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON -DUSE_LTO:BOOL=ON \
@@ -108,5 +119,3 @@ pushd "$OPENJPEG_SOURCE_DIR"
     mkdir -p "$stage/LICENSES"
     cp LICENSE "$stage/LICENSES/openjpeg.txt"
 popd
-
-pass
