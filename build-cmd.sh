@@ -57,33 +57,36 @@ pushd "$OPENJPEG_SOURCE_DIR"
         windows*)
             load_vsvars
 
-            cmake . -G "$AUTOBUILD_WIN_CMAKE_GEN" -DCMAKE_INSTALL_PREFIX=$stage
+            mkdir -p "build"
+            pushd "build"
+                cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$stage
             
-            cmake --build . --config Debug --clean-first
-            cmake --build . --config Release --clean-first
+                cmake --build . --config Debug --clean-first
+                cmake --build . --config Release --clean-first
 
-            mkdir -p "$stage/lib/debug"
-            mkdir -p "$stage/lib/release"
-            cp bin/Release/openjpeg{.dll,.lib} "$stage/lib/release"
-            cp bin/Debug/openjpeg{.dll,.lib,.pdb} "$stage/lib/debug"
+                mkdir -p "$stage/lib/debug"
+                mkdir -p "$stage/lib/release"
+                cp bin/Release/openjpeg{.dll,.lib,.pdb} "$stage/lib/release"
+                cp bin/Debug/openjpeg{.dll,.lib,.pdb} "$stage/lib/debug"
+            popd
             mkdir -p "$stage/include/openjpeg"
             cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
         ;;
 
         "darwin")
-	    cmake . -GXcode -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
+        cmake . -GXcode -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
             -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON -DUSE_LTO:BOOL=ON \
             -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_INSTALL_PREFIX=$stage
-	    xcodebuild -configuration Release -sdk macosx10.11 \
+        xcodebuild -configuration Release -sdk macosx10.11 \
             -target openjpeg -project openjpeg.xcodeproj
-	    xcodebuild -configuration Release -sdk macosx10.11 \
+        xcodebuild -configuration Release -sdk macosx10.11 \
             -target install -project openjpeg.xcodeproj
         install_name_tool -id "@executable_path/../Resources/libopenjpeg.dylib" "${stage}/lib/libopenjpeg.5.dylib"
             mkdir -p "${stage}/lib/release"
-	    cp "${stage}"/lib/libopenjpeg.* "${stage}/lib/release/"
+        cp "${stage}"/lib/libopenjpeg.* "${stage}/lib/release/"
             mkdir -p "${stage}/include/openjpeg"
-	    cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg"
-	  
+        cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg"
+      
         ;;
         "linux")
             JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
