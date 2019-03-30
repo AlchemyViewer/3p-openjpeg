@@ -11,6 +11,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 IF(COMMAND CMAKE_POLICY)
   CMAKE_POLICY(SET CMP0003 NEW)
+  CMAKE_POLICY(SET CMP0054 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
 IF(NOT OPENJPEG_NAMESPACE)
@@ -21,6 +22,30 @@ ENDIF(NOT OPENJPEG_NAMESPACE)
 STRING(TOLOWER ${OPENJPEG_NAMESPACE} OPENJPEG_LIBRARY_NAME)
 
 PROJECT(${OPENJPEG_NAMESPACE} C)
+
+#-----------------------------------------------------------------------------
+# Compiler specific flags:
+IF(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast -ffast-math")
+  IF(LTO AND BUILD_SHARED_LIBS)
+    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -flto")
+    SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -flto")
+  ENDIF(LTO AND BUILD_SHARED_LIBS)
+ELSEIF(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  # For all builds, make sure openjpeg is std99 compliant:
+  # SET(CMAKE_C_FLAGS "-Wall -std=c99 ${CMAKE_C_FLAGS}") # FIXME: this setting prevented us from setting a coverage build.
+  # Do not use ffast-math for all build, it would produce incorrect results, only set for release:
+  SET(CMAKE_C_FLAGS_RELEASE "-ffast-math ${CMAKE_C_FLAGS_RELEASE}")
+ELSEIF (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+  if(MSVC_VERSION GREATER_EQUAL 1920)
+    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /O2 /Ob3 /Oi /Ot /GF /arch:SSE2")
+    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Ob3 /Oi /Ot /GF /arch:SSE2")
+  else()
+    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /O2 /Ob2 /Oi /Ot /GF /arch:SSE2")
+    SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /Ob2 /Oi /Ot /GF /arch:SSE2")
+  endif()
+  SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /OPT:REF /OPT:ICF /DEBUG:FULL")
+ENDIF(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
 
 # Do full dependency headers.
 INCLUDE_REGULAR_EXPRESSION("^.*$")
@@ -178,24 +203,6 @@ IF(UNIX)
   \"libopenjpeg1.pc\"
   \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${OPENJPEG_INSTALL_SHARE_DIR}/pkgconfig/libopenjpeg.pc\")")
 ENDIF(UNIX)
-
-#-----------------------------------------------------------------------------
-# Compiler specific flags:
-IF(${CMAKE_C_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_C_COMPILER_ID} MATCHES "AppleClang")
-  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Ofast -ffast-math")
-  IF(LTO AND BUILD_SHARED_LIBS)
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -flto")
-    SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} -flto")
-  ENDIF(LTO AND BUILD_SHARED_LIBS)
-ELSEIF(${CMAKE_C_COMPILER_ID} MATCHES "GNU")
-  # For all builds, make sure openjpeg is std99 compliant:
-  # SET(CMAKE_C_FLAGS "-Wall -std=c99 ${CMAKE_C_FLAGS}") # FIXME: this setting prevented us from setting a coverage build.
-  # Do not use ffast-math for all build, it would produce incorrect results, only set for release:
-  SET(CMAKE_C_FLAGS_RELEASE "-ffast-math ${CMAKE_C_FLAGS_RELEASE}")
-ELSEIF (${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
-  SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /O2 /Ob2 /Oi /Ot /GF /arch:SSE2")
-  SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /OPT:REF")
-ENDIF(${CMAKE_C_COMPILER_ID} MATCHES "Clang" OR ${CMAKE_C_COMPILER_ID} MATCHES "AppleClang")
 
 #-----------------------------------------------------------------------------
 # opj_config.h generation (1/2)
