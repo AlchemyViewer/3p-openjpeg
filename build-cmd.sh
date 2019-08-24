@@ -57,8 +57,16 @@ pushd "$OPENJPEG_SOURCE_DIR"
         windows*)
             load_vsvars
 
+            if [ "$AUTOBUILD_ADDRSIZE" = 32 ]
+            then
+                archflags=""
+            else
+                archflags="/arch:AVX"
+            fi
+
             mkdir -p "build"
             pushd "build"
+                cmake -E env CFLAGS="$archflags" CXXFLAGS="$archflags" \
                 cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$stage
             
                 cmake --build . --config Debug --clean-first
