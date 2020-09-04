@@ -59,15 +59,15 @@ pushd "$OPENJPEG_SOURCE_DIR"
 
             if [ "$AUTOBUILD_ADDRSIZE" = 32 ]
             then
-                archflags=""
+                archflags="/arch:SSE2"
             else
-                archflags="/arch:AVX"
+                archflags=""
             fi
 
             mkdir -p "build"
             pushd "build"
                 cmake -E env CFLAGS="$archflags" CXXFLAGS="$archflags" \
-                cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$stage
+                cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$stage -DLTO=ON
             
                 cmake --build . --config Debug --clean-first
                 cmake --build . --config Release --clean-first
