@@ -66,7 +66,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
 
             mkdir -p "build"
             pushd "build"
-                cmake -E env CFLAGS="$archflags" CXXFLAGS="$archflags" \
+                cmake -E env CFLAGS="$archflags" CXXFLAGS="$archflags /std:c++17 /permissive-" \
                 cmake .. -G "$AUTOBUILD_WIN_CMAKE_GEN" -A "$AUTOBUILD_WIN_VSPLATFORM" -DCMAKE_INSTALL_PREFIX=$stage -DLTO=ON
             
                 cmake --build . --config Debug --clean-first
