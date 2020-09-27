@@ -29,11 +29,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "opj_includes.h"
+
 #ifdef __SSE__
 #include <xmmintrin.h>
 #endif
-
-#include "opj_includes.h"
 
 /* <summary> */
 /* This table contains the norms of the basis function of the reversible MCT. */
