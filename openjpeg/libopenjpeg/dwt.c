@@ -31,10 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define OPJ_SKIP_POISON
 #include "opj_includes.h"
 
 #ifdef __SSE__
 #include <xmmintrin.h>
+#endif
+
+#if defined(__GNUC__)
+#pragma GCC poison malloc calloc realloc free
 #endif
 
 /** @defgroup DWT DWT - Implementation of a discrete wavelet transform */
