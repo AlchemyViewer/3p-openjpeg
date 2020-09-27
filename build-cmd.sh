@@ -46,8 +46,8 @@ shortver="${short//.}"
 echo "${version}.${build}" > "${stage}/VERSION.txt"
 
 # Create the staging folders
-mkdir -p "$stage/lib"/{debug,release,relwithdebinfo}
-mkdir -p "$stage/include/openjpeg"
+mkdir -p "$stage/lib"/{debug,release}
+mkdir -p "$stage/include/openjpeg-1.5"
 mkdir -p "$stage/LICENSES"
 
 pushd "$OPENJPEG_SOURCE_DIR"
@@ -72,57 +72,104 @@ pushd "$OPENJPEG_SOURCE_DIR"
                 cmake --build . --config Debug --clean-first
                 cmake --build . --config Release --clean-first
 
-                mkdir -p "$stage/lib/debug"
-                mkdir -p "$stage/lib/release"
                 cp bin/Release/openjpeg{.dll,.lib,.pdb} "$stage/lib/release"
                 cp bin/Debug/openjpeg{.dll,.lib,.pdb} "$stage/lib/debug"
             popd
-            mkdir -p "$stage/include/openjpeg"
-            cp libopenjpeg/openjpeg.h "$stage/include/openjpeg"
+            cp libopenjpeg/openjpeg.h "$stage/include/openjpeg-1.5"
         ;;
+        "darwin64")
+            cmake . -GXcode -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
+                -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON -DUSE_LTO:BOOL=ON \
+                -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_INSTALL_PREFIX=$stage
+            xcodebuild -configuration Release -sdk macosx10.11 \
+                -target openjpeg -project openjpeg.xcodeproj
+            xcodebuild -configuration Release -sdk macosx10.11 \
+                -target install -project openjpeg.xcodeproj
+            install_name_tool -id "@executable_path/../Resources/libopenjpeg.dylib" "${stage}/lib/libopenjpeg.5.dylib"
 
-        "darwin")
-        cmake . -GXcode -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
-            -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON -DUSE_LTO:BOOL=ON \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_INSTALL_PREFIX=$stage
-        xcodebuild -configuration Release -sdk macosx10.11 \
-            -target openjpeg -project openjpeg.xcodeproj
-        xcodebuild -configuration Release -sdk macosx10.11 \
-            -target install -project openjpeg.xcodeproj
-        install_name_tool -id "@executable_path/../Resources/libopenjpeg.dylib" "${stage}/lib/libopenjpeg.5.dylib"
-            mkdir -p "${stage}/lib/release"
-        cp "${stage}"/lib/libopenjpeg.* "${stage}/lib/release/"
-            mkdir -p "${stage}/include/openjpeg"
-        cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg"
-      
+            cp "${stage}"/lib/libopenjpeg.* "${stage}/lib/release/"
+            cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg"
         ;;
-        "linux")
+        linux*)
+            # Linux build environment at Linden comes pre-polluted with stuff that can
+            # seriously damage 3rd-party builds.  Environmental garbage you can expect
+            # includes:
+            #
+            #    DISTCC_POTENTIAL_HOSTS     arch           root        CXXFLAGS
+            #    DISTCC_LOCATION            top            branch      CC
+            #    DISTCC_HOSTS               build_name     suffix      CXX
+            #    LSDISTCC_ARGS              repo           prefix      CFLAGS
+            #    cxx_version                AUTOBUILD      SIGN        CPPFLAGS
+            #
+            # So, clear out bits that shouldn't affect our configure-directed build
+            # but which do nonetheless.
+            #
+            unset DISTCC_HOSTS CC CXX CFLAGS CPPFLAGS CXXFLAGS
+
+            # Default target per autobuild build --address-size
+            opts="${TARGET_OPTS:--m$AUTOBUILD_ADDRSIZE}"
+            DEBUG_COMMON_FLAGS="$opts -Og -msse2 -g -fPIC -DPIC"
+            RELEASE_COMMON_FLAGS="$opts -O3 -msse2 -ffast-math -g -fPIC -DPIC -fstack-protector-strong -D_FORTIFY_SOURCE=2"
+            DEBUG_CFLAGS="$DEBUG_COMMON_FLAGS"
+            RELEASE_CFLAGS="$RELEASE_COMMON_FLAGS"
+            DEBUG_CXXFLAGS="$DEBUG_COMMON_FLAGS -std=c++17"
+            RELEASE_CXXFLAGS="$RELEASE_COMMON_FLAGS -std=c++17"
+            DEBUG_CPPFLAGS="-DPIC"
+            RELEASE_CPPFLAGS="-DPIC"
+
             JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
-            HARDENED="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
-            CFLAGS="-m32 -O3 -ffast-math $HARDENED" CPPFLAGS="-m32" LDFLAGS="-m32" ./configure --prefix="$stage" \
-                --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
+
+            # Handle any deliberate platform targeting
+            if [ -z "${TARGET_CPPFLAGS:-}" ]; then
+                # Remove sysroot contamination from build environment
+                unset CPPFLAGS
+            else
+                # Incorporate special pre-processing flags
+                export CPPFLAGS="$TARGET_CPPFLAGS"
+            fi
+
+            # Fix up path for pkgconfig
+            if [ -d "$stage/packages/lib/release/pkgconfig" ]; then
+                fix_pkgconfig_prefix "$stage/packages"
+            fi
+
+            autoreconf -fvi
+
+            OLD_PKG_CONFIG_PATH="${PKG_CONFIG_PATH:-}"
+
+            # Debug first
+            export PKG_CONFIG_PATH="$stage/packages/lib/debug/pkgconfig:${OLD_PKG_CONFIG_PATH}"
+
+            CFLAGS="$DEBUG_CFLAGS" CXXFLAGS="$DEBUG_CXXFLAGS" CPPFLAGS="$DEBUG_CPPFLAGS" \
+                ./configure --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no \
+                    --prefix="\${AUTOBUILD_PACKAGES_DIR}" --includedir="\${prefix}/include" --libdir="\${prefix}/lib/debug"
             make -j$JOBS
-            make install
+            make install DESTDIR="$stage"
 
-            mv "$stage/include/openjpeg-1.5" "$stage/include/openjpeg"
+            # conditionally run unit tests
+            # if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+            #     make test
+            # fi
 
-            mv "$stage/lib" "$stage/release"
-            mkdir -p "$stage/lib"
-            mv "$stage/release" "$stage/lib"
-        ;;
-        "linux64")
-            JOBS=`cat /proc/cpuinfo | grep processor | wc -l`
-            HARDENED="-fstack-protector-strong -D_FORTIFY_SOURCE=2"
-            CFLAGS="-m64 -O3 -ffast-math $HARDENED" CPPFLAGS="-m64" LDFLAGS="-m64" ./configure --prefix="$stage" \
-                --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no
+            # clean the build artifacts
+            make distclean
+
+            # Release last
+            export PKG_CONFIG_PATH="$stage/packages/lib/release/pkgconfig:${OLD_PKG_CONFIG_PATH}"
+
+            CFLAGS="$RELEASE_CFLAGS" CXXFLAGS="$RELEASE_CXXFLAGS" CPPFLAGS="$RELEASE_CPPFLAGS" \
+                ./configure --enable-png=no --enable-lcms1=no --enable-lcms2=no --enable-tiff=no \
+                    --prefix="\${AUTOBUILD_PACKAGES_DIR}" --includedir="\${prefix}/include" --libdir="\${prefix}/lib/release"
             make -j$JOBS
-            make install
+            make install DESTDIR="$stage"
 
-            mv "$stage/include/openjpeg-1.5" "$stage/include/openjpeg"
+            # conditionally run unit tests
+            # if [ "${DISABLE_UNIT_TESTS:-0}" = "0" ]; then
+            #     make test
+            # fi
 
-            mv "$stage/lib" "$stage/release"
-            mkdir -p "$stage/lib"
-            mv "$stage/release" "$stage/lib"
+            # clean the build artifacts
+            make distclean
         ;;
     esac
     mkdir -p "$stage/LICENSES"

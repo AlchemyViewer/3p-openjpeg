@@ -42,7 +42,7 @@
           <key>manifest</key>
           <array>
             <string>LICENSES/openjpeg.txt</string>
-            <string>include/openjpeg/*.h</string>
+            <string>include/openjpeg-1.5/*.h</string>
           </array>
           <key>name</key>
           <string>common</string>
@@ -86,7 +86,7 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/release/libopenjpeg*.so*</string>
+            <string>lib/debug/libopenjpeg.a</string>
             <string>lib/release/libopenjpeg.a</string>
           </array>
           <key>name</key>
