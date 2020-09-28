@@ -32,7 +32,7 @@
 #define OPJ_STDINT_H
 
 #include "opj_config.h"
-#ifdef OPJ_HAVE_STDINT_H
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || _MSC_VER >= 1900
 #include <stdint.h>
 #else
 #if defined(_WIN32)
