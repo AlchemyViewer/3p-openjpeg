@@ -76,6 +76,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
                 cp bin/Debug/openjpeg{.dll,.lib,.pdb} "$stage/lib/debug"
             popd
             cp libopenjpeg/openjpeg.h "$stage/include/openjpeg-1.5"
+            cp libopenjpeg/opj_stdint.h "$stage/include/openjpeg-1.5"
         ;;
         "darwin64")
             cmake . -GXcode -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
@@ -88,7 +89,8 @@ pushd "$OPENJPEG_SOURCE_DIR"
             install_name_tool -id "@executable_path/../Resources/libopenjpeg.dylib" "${stage}/lib/libopenjpeg.5.dylib"
 
             cp "${stage}"/lib/libopenjpeg.* "${stage}/lib/release/"
-            cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg"
+            cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg-1.5"
+            cp "libopenjpeg/opj_stdint.h" "${stage}/include/openjpeg-1.5"
         ;;
         linux*)
             # Linux build environment at Linden comes pre-polluted with stuff that can
