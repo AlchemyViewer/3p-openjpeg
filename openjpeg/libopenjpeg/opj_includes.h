@@ -140,6 +140,9 @@ static INLINE long opj_lrintf(float f)
 #   ifndef __SSE2__
 #       define __SSE2__ 1
 #   endif
+#   if !defined(__SSE4_1__) && defined(__AVX__)
+#       define __SSE4_1__ 1
+#   endif
 #endif
 
 /* For x86, test the value of the _M_IX86_FP macro. */

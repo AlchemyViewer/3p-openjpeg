@@ -653,7 +653,24 @@ static void v4dwt_decode_step2_sse(v4* l, v4* w, int k, int m, __m128 c){
 	int i;
 	__m128 tmp1, tmp2, tmp3;
 	tmp1 = vl[0];
-	for(i = 0; i < m; ++i){
+	for (i = 0; i < m - 3; i += 4) {
+		__m128 tmp4, tmp5, tmp6, tmp7, tmp8, tmp9;
+		tmp2 = vw[-1];
+		tmp3 = vw[0];
+		tmp4 = vw[1];
+		tmp5 = vw[2];
+		tmp6 = vw[3];
+		tmp7 = vw[4];
+		tmp8 = vw[5];
+		tmp9 = vw[6];
+		vw[-1] = _mm_add_ps(tmp2, _mm_mul_ps(_mm_add_ps(tmp1, tmp3), c));
+		vw[1] = _mm_add_ps(tmp4, _mm_mul_ps(_mm_add_ps(tmp3, tmp5), c));
+		vw[3] = _mm_add_ps(tmp6, _mm_mul_ps(_mm_add_ps(tmp5, tmp7), c));
+		vw[5] = _mm_add_ps(tmp8, _mm_mul_ps(_mm_add_ps(tmp7, tmp9), c));
+		tmp1 = tmp9;
+		vw += 8;
+	}
+	for ( ; i < m; ++i) {
 		tmp2 = vw[-1];
 		tmp3 = vw[ 0];
 		vw[-1] = _mm_add_ps(tmp2, _mm_mul_ps(_mm_add_ps(tmp1, tmp3), c));
