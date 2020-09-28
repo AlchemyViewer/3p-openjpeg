@@ -54,9 +54,9 @@ static const double mct_norms_real[3] = { 1.732, 1.805, 1.573 };
 /* Foward reversible MCT. */
 /* </summary> */
 void mct_encode(
-		int* restrict c0,
-		int* restrict c1,
-		int* restrict c2,
+		int* OPJ_RESTRICT c0,
+		int* OPJ_RESTRICT c1,
+		int* OPJ_RESTRICT c2,
 		int n)
 {
 	int i;
@@ -64,7 +64,7 @@ void mct_encode(
 		int r = c0[i];
 		int g = c1[i];
 		int b = c2[i];
-		int y = (r + (g * 2) + b) >> 2;
+		int y = (r + g + g + b) >> 2;
 		int u = b - g;
 		int v = r - g;
 		c0[i] = y;
@@ -77,9 +77,9 @@ void mct_encode(
 /* Inverse reversible MCT. */
 /* </summary> */
 void mct_decode(
-		int* restrict c0,
-		int* restrict c1, 
-		int* restrict c2, 
+		int* OPJ_RESTRICT c0,
+		int* OPJ_RESTRICT c1,
+		int* OPJ_RESTRICT c2,
 		int n)
 {
 	int i;
@@ -107,9 +107,9 @@ double mct_getnorm(int compno) {
 /* Foward irreversible MCT. */
 /* </summary> */
 void mct_encode_real(
-		int* restrict c0,
-		int* restrict c1,
-		int* restrict c2,
+		int* OPJ_RESTRICT c0,
+		int* OPJ_RESTRICT c1,
+		int* OPJ_RESTRICT c2,
 		int n)
 {
 	int i;
@@ -130,19 +130,21 @@ void mct_encode_real(
 /* Inverse irreversible MCT. */
 /* </summary> */
 void mct_decode_real(
-		float* restrict c0,
-		float* restrict c1,
-		float* restrict c2,
+		float* OPJ_RESTRICT c0,
+		float* OPJ_RESTRICT c1,
+		float* OPJ_RESTRICT c2,
 		int n)
 {
 	int i;
 #ifdef __SSE__
+	int count;
 	__m128 vrv, vgu, vgv, vbu;
 	vrv = _mm_set1_ps(1.402f);
 	vgu = _mm_set1_ps(0.34413f);
 	vgv = _mm_set1_ps(0.71414f);
 	vbu = _mm_set1_ps(1.772f);
-	for (i = 0; i < (n >> 3); ++i) {
+	count = n >> 3;
+	for (i = 0; i < count; ++i) {
 		__m128 vy, vu, vv;
 		__m128 vr, vg, vb;
 
@@ -179,7 +181,7 @@ void mct_decode_real(
 		float u = c1[i];
 		float v = c2[i];
 		float r = y + (v * 1.402f);
-		float g = y - (u * 0.34413f) - (v * (0.71414f));
+		float g = y - (u * 0.34413f) - (v * 0.71414f);
 		float b = y + (u * 1.772f);
 		c0[i] = r;
 		c1[i] = g;
