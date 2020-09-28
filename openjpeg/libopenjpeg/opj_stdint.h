@@ -31,7 +31,6 @@
 #ifndef OPJ_STDINT_H
 #define OPJ_STDINT_H
 
-#include "opj_config.h"
 #if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || _MSC_VER >= 1900
 #include <stdint.h>
 #else
