@@ -7,7 +7,7 @@ SUBDIRS += jpwl
 endif
 
 includesdir = $(includedir)/openjpeg-$(MAJOR_NR).$(MINOR_NR)
-includes_HEADERS = openjpeg.h
+includes_HEADERS = openjpeg.h opj_stdint.h
 
 lib_LTLIBRARIES = libopenjpeg.la
 
@@ -32,6 +32,7 @@ jpt.c \
 mct.c \
 mqc.c \
 openjpeg.c \
+opj_malloc.c \
 pi.c \
 raw.c \
 t1.c \
@@ -60,6 +61,7 @@ mct.h \
 mqc.h \
 opj_includes.h \
 opj_malloc.h \
+opj_stdint.h \
 pi.h \
 raw.h \
 t1.h \
