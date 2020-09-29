@@ -86,8 +86,8 @@
           </map>
           <key>manifest</key>
           <array>
-            <string>lib/debug/libopenjpeg.a</string>
-            <string>lib/release/libopenjpeg.a</string>
+            <string>lib/debug/libopenjpeg.so*</string>
+            <string>lib/release/libopenjpeg.so*</string>
           </array>
           <key>name</key>
           <string>linux</string>
