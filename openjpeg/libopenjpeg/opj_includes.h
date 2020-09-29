@@ -57,19 +57,14 @@
 */
 
 /* Are restricted pointers available? (C99) */
-#if (__STDC_VERSION__ >= 199901L) || _MSC_VER >= 1900
+#if (__STDC_VERSION__ >= 199901L)
 #define OPJ_RESTRICT restrict
 #else
 /* Not a C99 compiler */
 #if defined(__GNUC__)
 #define OPJ_RESTRICT __restrict__
-
-/*
-  vc14 (2015) outputs wrong results.
-  Need to check OPJ_RESTRICT usage (or a bug in vc14)
-    #elif defined(_MSC_VER) && (_MSC_VER >= 1400)
-        #define OPJ_RESTRICT __restrict
-*/
+#elif defined(_MSC_VER) && (_MSC_VER >= 1400)
+#define OPJ_RESTRICT __restrict
 #else
 #define OPJ_RESTRICT /* restrict */
 #endif
@@ -79,24 +74,6 @@
 #ifndef __GNUC__
 	#define __attribute__(x) /* __attribute__(x) */
 #endif
-
-/*
-The inline keyword is supported by C99 but not by C90.
-Most compilers implement their own version of this keyword ...
-*/
-#ifndef INLINE
-	#if defined(_MSC_VER)
-		#define INLINE __forceinline
-	#elif defined(__GNUC__)
-		#define INLINE __inline__
-	#elif defined(__MWERKS__)
-		#define INLINE inline
-	#else
-		/* add other compilers here ... */
-		#define INLINE
-	#endif /* defined(<Compiler>) */
-#endif /* INLINE */
-
 
 
 /* MSVC before 2013 and Borland C do not have lrintf */
@@ -163,6 +140,9 @@ static INLINE long opj_lrintf(float f)
 #   ifndef __SSE2__
 #       define __SSE2__ 1
 #   endif
+#   if !defined(__SSE4_1__) && defined(__AVX__)
+#       define __SSE4_1__ 1
+#   endif
 #endif
 
 /* For x86, test the value of the _M_IX86_FP macro. */
@@ -179,6 +159,11 @@ static INLINE long opj_lrintf(float f)
 #       endif
 #   endif
 #endif
+
+/* Type to use for bit-fields in internal headers */
+typedef unsigned int OPJ_BITFIELD;
+
+#define OPJ_UNUSED(x) (void)x
 
 #include "j2k_lib.h"
 #include "opj_malloc.h"
