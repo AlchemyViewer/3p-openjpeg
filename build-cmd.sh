@@ -29,12 +29,9 @@ source_environment_tempfile="$stage/source_environment.sh"
 "$autobuild" source_environment > "$source_environment_tempfile"
 . "$source_environment_tempfile"
 
-OPENJPEG_VERSION="1.5.1"
 OPENJPEG_SOURCE_DIR="openjpeg"
 
 VERSION_HEADER_FILE="$OPENJPEG_SOURCE_DIR/libopenjpeg/openjpeg.h"
-
-build=${AUTOBUILD_BUILD_ID:=0}
 
 # version will be (e.g.) "1.4.0"
 version=`sed -n -E 's/#define OPENJPEG_VERSION "([0-9])[.]([0-9])[.]([0-9]).*/\1.\2.\3/p' "${VERSION_HEADER_FILE}"`
@@ -43,7 +40,7 @@ version=`sed -n -E 's/#define OPENJPEG_VERSION "([0-9])[.]([0-9])[.]([0-9]).*/\1
 short="$(echo $version | cut -d"." -f1-2)"
 shortver="${short//.}"
 
-echo "${version}.${build}" > "${stage}/VERSION.txt"
+echo "${version}" > "${stage}/VERSION.txt"
 
 # Create the staging folders
 mkdir -p "$stage/lib"/{debug,release}
