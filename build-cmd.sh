@@ -76,16 +76,60 @@ pushd "$OPENJPEG_SOURCE_DIR"
             cp libopenjpeg/opj_stdint.h "$stage/include/openjpeg-1.5"
         ;;
         "darwin64")
-            cmake . -GXcode -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 \
-                -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON -DUSE_LTO:BOOL=ON \
-                -DCMAKE_OSX_DEPLOYMENT_TARGET=10.8 -DCMAKE_INSTALL_PREFIX=$stage
-            xcodebuild -configuration Release -sdk macosx10.11 \
-                -target openjpeg -project openjpeg.xcodeproj
-            xcodebuild -configuration Release -sdk macosx10.11 \
-                -target install -project openjpeg.xcodeproj
-            install_name_tool -id "@executable_path/../Resources/libopenjpeg.dylib" "${stage}/lib/libopenjpeg.5.dylib"
+            mkdir -p "build_debug"
+            pushd "build_debug"
+                CFLAGS="-O0 -g -msse4.2" CXXFLAGS="-O0 -g -msse4.2" LDFLAGS="-headerpad_max_install_names" \
+                cmake .. -GXcode -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON \
+                    -DCMAKE_C_FLAGS_RELEASE="-O0 -msse4.2" \
+                    -DCMAKE_CXX_FLAGS_RELEASE="-std=c++17 -O0 -g -msse4.2" \
+                    -DCMAKE_XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL="0" \
+                    -DCMAKE_XCODE_ATTRIBUTE_GCC_FAST_MATH=NO \
+                    -DCMAKE_XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS=YES \
+                    -DCMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT=dwarf-with-dsym \
+                    -DCMAKE_XCODE_ATTRIBUTE_LLVM_LTO=NO \
+                    -DCMAKE_XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING=YES \
+                    -DCMAKE_XCODE_ATTRIBUTE_CLANG_X86_VECTOR_INSTRUCTIONS=sse4.2 \
+                    -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD="c++17" \
+                    -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY="libc++" \
+                    -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_OSX_SYSROOT=macosx10.15 \
+                    -DCMAKE_MACOSX_RPATH=YES -DCMAKE_INSTALL_PREFIX=$stage
 
-            cp "${stage}"/lib/libopenjpeg.* "${stage}/lib/release/"
+                cmake --build . --config Debug
+
+                cp -a bin/Debug/libopenjpeg*.dylib* "${stage}/lib/debug/"
+            popd
+
+            mkdir -p "build_release"
+            pushd "build_release"
+                CFLAGS="-Ofast -ffast-math -flto -g -msse4.2" CXXFLAGS="-Ofast -ffast-math -flto -g -msse4.2" LDFLAGS="-headerpad_max_install_names" \
+                cmake .. -GXcode -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON \
+                    -DCMAKE_C_FLAGS_RELEASE="-Ofast -ffast-math -flto -g -msse4.2" \
+                    -DCMAKE_CXX_FLAGS_RELEASE="-std=c++17 -Ofast -ffast-math -flto -g -msse4.2" \
+                    -DCMAKE_XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL="fast" \
+                    -DCMAKE_XCODE_ATTRIBUTE_GCC_FAST_MATH=YES \
+                    -DCMAKE_XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS=YES \
+                    -DCMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT=dwarf-with-dsym \
+                    -DCMAKE_XCODE_ATTRIBUTE_LLVM_LTO=YES \
+                    -DCMAKE_XCODE_ATTRIBUTE_DEAD_CODE_STRIPPING=YES \
+                    -DCMAKE_XCODE_ATTRIBUTE_CLANG_X86_VECTOR_INSTRUCTIONS=sse4.2 \
+                    -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD="c++17" \
+                    -DCMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY="libc++" \
+                    -DCMAKE_OSX_ARCHITECTURES:STRING=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_OSX_SYSROOT=macosx10.15 \
+                    -DCMAKE_MACOSX_RPATH=YES -DCMAKE_INSTALL_PREFIX=$stage
+
+                cmake --build . --config Release
+
+                cp -a bin/Release/libopenjpeg*.dylib* "${stage}/lib/release/"
+            popd
+
+            pushd "${stage}/lib/debug"
+                fix_dylib_id "libopenjpeg.dylib"
+            popd
+
+            pushd "${stage}/lib/release"
+                fix_dylib_id "libopenjpeg.dylib"
+            popd
+
             cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg-1.5"
             cp "libopenjpeg/opj_stdint.h" "${stage}/include/openjpeg-1.5"
         ;;
