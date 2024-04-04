@@ -101,7 +101,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
                 CXXFLAGS="$DEBUG_CXXFLAGS" \
                 CPPFLAGS="$DEBUG_CPPFLAGS" \
                 LDFLAGS="$DEBUG_LDFLAGS" \
-                cmake .. -GXcode -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON \
+                cmake .. -GXcode -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_CODEC:BOOL=ON \
                     -DCMAKE_C_FLAGS="$DEBUG_CFLAGS" \
                     -DCMAKE_CXX_FLAGS="$DEBUG_CXXFLAGS" \
                     -DCMAKE_XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL="0" \
@@ -124,7 +124,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
 
                 cmake --build . --config Debug
 
-                cp -a bin/Debug/libopenjpeg*.dylib* "${stage}/lib/debug/"
+                cp -a bin/Debug/libopenjpeg*.a* "${stage}/lib/debug/"
             popd
 
             mkdir -p "build_release"
@@ -133,7 +133,7 @@ pushd "$OPENJPEG_SOURCE_DIR"
                 CXXFLAGS="$RELEASE_CXXFLAGS" \
                 CPPFLAGS="$RELEASE_CPPFLAGS" \
                 LDFLAGS="$RELEASE_LDFLAGS" \
-                cmake .. -GXcode -DBUILD_SHARED_LIBS:BOOL=ON -DBUILD_CODEC:BOOL=ON \
+                cmake .. -GXcode -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_CODEC:BOOL=ON \
                     -DCMAKE_C_FLAGS="$RELEASE_CFLAGS" \
                     -DCMAKE_CXX_FLAGS="$RELEASE_CXXFLAGS" \
                     -DCMAKE_XCODE_ATTRIBUTE_GCC_OPTIMIZATION_LEVEL="fast" \
@@ -156,18 +156,18 @@ pushd "$OPENJPEG_SOURCE_DIR"
 
                 cmake --build . --config Release
 
-                cp -a bin/Release/libopenjpeg*.dylib* "${stage}/lib/release/"
+                cp -a bin/Release/libopenjpeg*.a* "${stage}/lib/release/"
             popd
 
-            pushd "${stage}/lib/debug"
-                fix_dylib_id "libopenjpeg.dylib"
-                strip -x -S libopenjpeg.dylib
-            popd
+            # pushd "${stage}/lib/debug"
+            #     fix_dylib_id "libopenjpeg.dylib"
+            #     strip -x -S libopenjpeg.dylib
+            # popd
 
-            pushd "${stage}/lib/release"
-                fix_dylib_id "libopenjpeg.dylib"
-                strip -x -S libopenjpeg.dylib
-            popd
+            # pushd "${stage}/lib/release"
+            #     fix_dylib_id "libopenjpeg.dylib"
+            #     strip -x -S libopenjpeg.dylib
+            # popd
 
             cp "libopenjpeg/openjpeg.h" "${stage}/include/openjpeg-1.5"
             cp "libopenjpeg/opj_stdint.h" "${stage}/include/openjpeg-1.5"
