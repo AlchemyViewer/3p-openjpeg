@@ -236,13 +236,13 @@ OPTION(BUILD_JAVA "Build the openjpeg jar (Java)" OFF)
 MARK_AS_ADVANCED(BUILD_VIEWER)
 MARK_AS_ADVANCED(BUILD_JAVA)
 
-IF(BUILD_CODEC OR BUILD_MJ2)
-  # OFF: It will only build 3rd party libs if they are not found on the system
-  # ON: 3rd party libs will ALWAYS be build, and used
-  OPTION(BUILD_THIRDPARTY "Build the thirdparty executables if it is needed" OFF)
-  ADD_SUBDIRECTORY(thirdparty)
-  ADD_SUBDIRECTORY(applications)
-ENDIF (BUILD_CODEC OR BUILD_MJ2)
+#IF(BUILD_CODEC OR BUILD_MJ2)
+#  # OFF: It will only build 3rd party libs if they are not found on the system
+#  # ON: 3rd party libs will ALWAYS be build, and used
+#  OPTION(BUILD_THIRDPARTY "Build the thirdparty executables if it is needed" OFF)
+#  ADD_SUBDIRECTORY(thirdparty)
+#  ADD_SUBDIRECTORY(applications)
+#ENDIF (BUILD_CODEC OR BUILD_MJ2)
 
 #-----------------------------------------------------------------------------
 # opj_config.h generation (2/2)
